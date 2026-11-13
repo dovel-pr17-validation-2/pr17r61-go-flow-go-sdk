@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - 'v**'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - master
+      - 'v**'
+      - 'feature/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.26'
+      - name: Run tests
+        run: |
+          make ci
+          make check-tidy
+          make check-headers
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v5
+        with:
+          file: ./coverage.txt
+          flags: unittests
